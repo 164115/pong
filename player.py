@@ -1,7 +1,7 @@
 from tkinter import *
 
 window = Tk()
-canvas = Canvas(window, width="1920", height="1080", background="blanchedalmond")
+canvas = Canvas(window, width="1920", height="1080", background="black")
 canvas.pack()
 
 can_move_down = True
