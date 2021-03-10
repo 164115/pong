@@ -5,14 +5,13 @@ canvas.pack()
 
 
 class player:
-    def __init__(self, c, w):
+    def __init__(self, c, ):
         self.player_x_val = 0
         self.player_y_val = 0
         self.can_move_down = True
         self.can_move_up = True
         self.player_object = canvas.create_rectangle(20, 100, 100, 400, fill="white")
         self.canvas = c
-        self.window = w
 
     def key_released(self, event):
         if event.keysym == "Up" or event.keysym == "Down":
@@ -21,15 +20,11 @@ class player:
     def key_pressed(self, event):
         if event.keysym == "Up" and self.can_move_down:
             self.player_y_val = -7
-            print("Key pressed")
         elif event.keysym == "Down" and self.can_move_up:
             self.player_y_val = 7
-            print("Key pressed")
 
-    def move_stuff(self):
+    def move_player(self):
         self.canvas.move(self.player_object, self.player_x_val, self.player_y_val)
-        print("Moving")
-        self.window.after(16, self.move_stuff)
         self.can_move_down = True
         self.can_move_up = True
         if self.canvas.coords(self.player_object)[1] < 0:  # Top wall
@@ -43,11 +38,58 @@ class player:
         self.canvas.bind("<KeyPress>", self.key_pressed)
         self.canvas.bind("<KeyRelease>", self.key_released)
         self.canvas.focus_set()
-        self.move_stuff()
+        self.move_player()
 
 
-player_1 = player(canvas, window)
+"""---------------------------------- yao code ----------------------------------"""
+
+
+def move_ball():
+    global ball_x_val, ball_y_val
+    if running == 1:
+        canvas.move(ball, ball_x_val, ball_y_val)
+        # Bounce off walls
+        if canvas.coords(ball)[2] > 1920:  # right wall
+            ball_x_val = -ball_x_val
+
+
+ball_x = 800
+ball_y = 800
+target_x = ball_x
+target_y = ball_y
+ball_width = 100
+ball_height = 100
+ball_x_val = 0
+ball_y_val = 20
+running = 1
+
+canvas.bind("<Button-2", )
+canvas.focus_set()
+ball = canvas.create_rectangle(ball_x, ball_y, ball_x + ball_width, ball_y + ball_height, fill="blue")
+
+
+
+def stop():
+    global running
+    if running == 1:
+        running = 0
+    elif running == 0:
+        running = 1
+
+
+stop_button = Button(window, command=stop, text="Stop bouncing!")
+stop_button.pack()
+
+exit_button = Button(window, command=window.destroy, text="Kill.")
+exit_button.pack()
+
+"""---------------------------------- yao code ----------------------------------"""
+
+player_1 = player(canvas)
 player_1.initialise_player()
 
-
-window.mainloop()
+while True:
+    canvas.after(16)
+    player_1.move_player()
+    move_ball()
+    canvas.update()
