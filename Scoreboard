@@ -1,0 +1,124 @@
+from tkinter import *
+import random
+import time
+
+tk = Tk()
+tk.title("Game")
+tk.resizable(0, 0)
+tk.wm_attributes("-topmost", 1)
+canvas = Canvas(tk, width=1000, height=750, bd=0, highlightthickness=0)
+canvas.pack()
+tk.update()
+
+
+class Ball:
+    def __init__(self, canvas, paddle, score1, score2, color):
+        self.canvas = canvas
+        self.paddle = paddle
+        self.score = score1
+        self.score2p = score2
+        self.ball_color = color
+        self.id = canvas.create_oval(10, 10, 25, 25, fill=self.ball_color)
+        self.canvas.move(self.id, 245, 100)
+        starts = [-3, 3]
+        random.shuffle(starts)
+        self.x = starts[0]
+        self.y = -3
+        self.canvas_height = self.canvas.winfo_height()
+        self.canvas_width = self.canvas.winfo_width()
+        self.point_recieved = False
+
+    def restart(self):
+        canvas.delete(self.id)
+        self.id = canvas.create_oval(10, 10, 25, 25, fill=self.ball_color)
+        self.canvas.move(self.id, 245, 100)
+        starts = [-3, 3]
+        random.shuffle(starts)
+        self.x = starts[0]
+        self.y = -3
+        self.point_recieved = False
+
+    def draw(self):
+        self.canvas.move(self.id, self.x, self.y)
+        pos = self.canvas.coords(self.id)
+        if pos[1] <= 0:
+            self.y = 3
+        if self.hit_left(pos):
+            self.y = -3
+        if self.hit_right(pos):
+            self.y = -3
+        if pos[3] >= self.canvas_height:
+            self.y = -3
+        if pos[0] <= 0:
+            self.point_recieved = True
+        if pos[2] >= self.canvas_width:
+            self.point_recieved = True
+
+    def hit_left(self, pos):
+        if pos[0] <= 0:
+            self.score.scoreboard += self.score.add_score
+            print(self.score.scoreboard)
+            canvas.itemconfig(score1.id, text='%s' % score1.scoreboard)
+            return False
+
+    def hit_right(self, pos):
+        if pos[0] == self.canvas_width - 25:
+            self.score2p.scoreboard += self.score2p.add_score
+            print(self.score2p.scoreboard)
+            canvas.itemconfig(score2.id, text='%s' % score2.scoreboard)
+            return False
+
+
+class Score:
+    def __init__(self, canvas, player):
+        self.canvas = canvas
+        self.add_score = 1
+        self.scoreboard = 0
+        if player == 1:
+            self.id = canvas.create_text((self.canvas.winfo_width() / 2 - 15), 25, font=("Arial", 25),
+                                         text='{}'.format(self.scoreboard))
+        else:
+            self.id = canvas.create_text((self.canvas.winfo_width() / 2 + 15), 25, font=("Arial", 25),
+                                         text='{}'.format(self.scoreboard))
+
+
+class Paddle:
+    def __init__(self, canvas, color):
+        self.canvas = canvas
+        self.id = canvas.create_rectangle(0, 0, 100, 10, fill=color)
+        self.canvas.move(self.id, 200, 300)
+        self.x = 0
+        self.y = 0
+        self.canvas_width = self.canvas.winfo_width()
+        self.canvas.bind_all('<KeyPress-Left>', self.move_down)
+        self.canvas.bind_all('<KeyPress-Right>', self.move_up)
+
+    def move_down(self, t):
+        self.y = -2
+
+    def move_up(self, t):
+        self.y = 2
+
+    def draw(self):
+        self.canvas.move(self.id, self.y, 0)
+        pos = self.canvas.coords(self.id)
+        if pos[0] <= 0:
+            self.y = 0
+        elif pos[2] >= self.canvas_width:
+            self.y = 0
+
+
+score1 = Score(canvas, 1)
+score2 = Score(canvas, 2)
+paddle = Paddle(canvas, 'blue')
+ball = Ball(canvas, paddle, score1, score2, 'red')
+
+while score1.scoreboard < 10 and score2.scoreboard < 10:
+    if not ball.point_recieved:
+        ball.draw()
+        paddle.draw()
+    else:
+        ball.restart()
+    tk.update_idletasks()
+    tk.update()
+    time.sleep(0.01)
